@@ -5,7 +5,8 @@ import Forge.Typecheck
 /-!
 # Forge compile-time optimizer
 
-Formal model of `fold_binary` / `simplify_binary` in `compiler/optimize.c`.
+Mathematical-integer model of `fold_binary` / `simplify_binary`.
+Int64 overflow guards are specified separately in CheckedInt64.
 Algebraic rules apply only to well-typed int operations (see `Typecheck`).
 -/
 
@@ -19,8 +20,8 @@ def foldBinInt (op : BinOp) (a b : Int) : Option Expr :=
   | .add => some (.intLit (a + b))
   | .sub => some (.intLit (a - b))
   | .mul => some (.intLit (a * b))
-  | .div => if b = 0 then none else some (.intLit (a / b))
-  | .mod => if b = 0 then none else some (.intLit (a % b))
+  | .div => if b = 0 then none else some (.intLit (a.tdiv b))
+  | .mod => if b = 0 then none else some (.intLit (a.tmod b))
   | .eq  => some (.boolLit (a = b))
   | .ne  => some (.boolLit (a ≠ b))
   | .lt  => some (.boolLit (a < b))

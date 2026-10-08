@@ -3,7 +3,9 @@ import Forge.AST
 /-!
 # Forge expression semantics
 
-Big-step evaluator mirroring `fold_binary` in `compiler/optimize.c`.
+Big-step mathematical-integer evaluator. Division/remainder follow C's
+truncation toward zero. Int64 bounds are specified separately in CheckedInt64;
+this model alone is not an exact model of the guarded C optimizer.
 -/
 
 namespace Forge
@@ -16,8 +18,8 @@ def evalBinInt (op : BinOp) (a b : Int) : Option Value :=
   | .add => some (.int (a + b))
   | .sub => some (.int (a - b))
   | .mul => some (.int (a * b))
-  | .div => if b = 0 then none else some (.int (a / b))
-  | .mod => if b = 0 then none else some (.int (a % b))
+  | .div => if b = 0 then none else some (.int (a.tdiv b))
+  | .mod => if b = 0 then none else some (.int (a.tmod b))
   | .eq  => some (.bool (a = b))
   | .ne  => some (.bool (a ≠ b))
   | .lt  => some (.bool (a < b))
